@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Light OKX Trade</string>
+  </property>
+  <property name="windowIcon">
+   <iconset theme="preferences-system-network">
+    <normaloff>.</normaloff>.</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QLabel" name="label_head">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>10</y>
+      <width>781</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Header</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rb_main">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>50</y>
+      <width>100</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Main Acc.</string>
+    </property>
+    <property name="checked">
+     <bool>false</bool>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rb_trade">
+    <property name="geometry">
+     <rect>
+      <x>120</x>
+      <y>50</y>
+      <width>100</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Trade Acc.</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_getbal">
+    <property name="geometry">
+     <rect>
+      <x>240</x>
+      <y>50</y>
+      <width>100</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Get Balance</string>
+    </property>
+    <property name="icon">
+     <iconset theme="image-x-generic">
+      <normaloff>.</normaloff>.</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_getord">
+    <property name="geometry">
+     <rect>
+      <x>350</x>
+      <y>50</y>
+      <width>100</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Get Orders</string>
+    </property>
+    <property name="icon">
+     <iconset theme="x-office-document">
+      <normaloff>.</normaloff>.</iconset>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_neword">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>420</y>
+      <width>111</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Open New Order</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rb_market">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>460</y>
+      <width>70</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Market</string>
+    </property>
+   </widget>
+   <widget class="QRadioButton" name="rb_limit">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>460</y>
+      <width>70</width>
+      <height>24</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Limit</string>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="editline_simbol">
+    <property name="geometry">
+     <rect>
+      <x>70</x>
+      <y>500</y>
+      <width>70</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_simbol">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>505</y>
+      <width>50</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Simbol:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_price">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>505</y>
+      <width>50</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Price:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="editline_price">
+    <property name="geometry">
+     <rect>
+      <x>200</x>
+      <y>500</y>
+      <width>70</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_count">
+    <property name="geometry">
+     <rect>
+      <x>280</x>
+      <y>505</y>
+      <width>50</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Count:</string>
+    </property>
+   </widget>
+   <widget class="Line" name="line">
+    <property name="geometry">
+     <rect>
+      <x>330</x>
+      <y>480</y>
+      <width>3</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="editline_fiat">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>480</y>
+      <width>70</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="editline_cur">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>515</y>
+      <width>70</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_inusdt">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>480</y>
+      <width>70</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>in usdt</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_incur">
+    <property name="geometry">
+     <rect>
+      <x>420</x>
+      <y>520</y>
+      <width>70</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>in currency</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_buy">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>470</y>
+      <width>80</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="autoFillBackground">
+     <bool>false</bool>
+    </property>
+    <property name="text">
+     <string>Buy</string>
+    </property>
+    <property name="icon">
+     <iconset theme="system-software-install">
+      <normaloff>.</normaloff>.</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_sell">
+    <property name="geometry">
+     <rect>
+      <x>520</x>
+      <y>510</y>
+      <width>80</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Sell</string>
+    </property>
+    <property name="icon">
+     <iconset theme="system-software-update">
+      <normaloff>.</normaloff>.</iconset>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="btn_exit">
+    <property name="geometry">
+     <rect>
+      <x>710</x>
+      <y>520</y>
+      <width>80</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Exit</string>
+    </property>
+    <property name="icon">
+     <iconset theme="media-record">
+      <normaloff>.</normaloff>.</iconset>
+    </property>
+   </widget>
+   <widget class="QTableWidget" name="tableWidget_main">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>781</width>
+      <height>331</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>23</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

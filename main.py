@@ -1,53 +1,83 @@
-import json
 import os
-from dotenv import load_dotenv
+import sys
 from decimal import Decimal, ROUND_DOWN
 
-import okx.Account as Account
-import okx.MarketData as MarketData
+from PyQt6 import QtWidgets
+from PyQt6.QtWidgets import QApplication, QTableWidgetItem
 
-load_dotenv()
-API_KEY = os.getenv("API_KEY")
-SECRET_KEY = os.getenv("SECRET_KEY")
-PASSPHRASE = os.getenv("PASSPHRASE")
+from QDesign.main_iface import Ui_MainWindow
+from terminal import OkxApiInterface, OKXAPIError
 
-# flag='0' — реальные торги, flag='1' — демо-режим (песочница)
-flag = '1'
 format_balance = Decimal("0.00001")
 
-def start_api():
-    print("Welcome to simple trading script")
-    account_api = Account.AccountAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
-    return account_api
+class OKXTradeMainWindow(QtWidgets.QMainWindow):
+    """Класс основной формы приложения"""
 
+    def __init__(self):
+        super(OKXTradeMainWindow, self).__init__()
+        self.ui = Ui_MainWindow()
+        self.ui.setupUi(self)
+        self.api = OkxApiInterface()
 
-def show_json(datajson):
-    """Показать полный dump json данных"""
+        # Btn Configuration
+        self.ui.btn_getbal.clicked.connect(self.get_ballance)
+        self.ui.btn_getord.clicked.connect(self.get_orders)
+        self.ui.btn_buy.clicked.connect(self.send_buy)
+        self.ui.btn_sell.clicked.connect(self.send_sell)
+        self.ui.btn_exit.clicked.connect(QtWidgets.QApplication.instance().quit)
 
-    beautiful_json = json.dumps(datajson, indent=4, ensure_ascii=False)
-    print(beautiful_json)
+    def get_ballance(self):
+        self.table_main = self.ui.tableWidget_main
+        self.table_main.clear()
 
+        self.table_main.setColumnCount(3)
+        self.table_main.setColumnWidth(1, 200)
+        self.table_main.setColumnWidth(2, 200)
+        self.table_main.setHorizontalHeaderLabels(["Ticker", "Balance", "Balance in USD"])
 
-def get_balace_trade(api):
-    """Получить баланс по trading аккаунту"""
-    result_balance = api.get_account_balance()
-    return [{"ticker": val["ccy"], "balance": val["eq"]} for val in result_balance["data"][0]["details"]]
+        try:
+            if self.ui.rb_main.isChecked():
+                data = self.api.get_balance_funding()
+            elif self.ui.rb_trade.isChecked():
+                data = self.api.get_balace_trade()
 
+        except OKXAPIError as e:
+            self.ui.statusbar.setStyleSheet("color: red;")
+            self.ui.statusbar.showMessage(str(e))
 
-def show_balance_trade(short_balance):
-    for item in short_balance:
-        print(f'{item["ticker"]} = {Decimal(item["balance"]).quantize(format_balance, rounding=ROUND_DOWN)}')
+        except Exception as e:
+            self.ui.statusbar.setStyleSheet("color: red;")
+            self.ui.statusbar.showMessage(f"System error: {str(e)}")
 
-def get_price_ticker(api, ticker: str) -> str:
-    result_ticker = api.get_ticker(instType="SPOT", instId=ticker)
-    return result_ticker
+        self.ui.statusbar.setStyleSheet("color: green;")
+        self.ui.statusbar.showMessage(f"Successful get balance")
+        self.table_main.setRowCount(len(data))
 
-# Модуль для чтения рыночных данных (стаканы, цены)
-#market_api = MarketData.MarketAPI(use_server_time=False, flag=flag)
+        for row, record in enumerate(data):
+            for col, value in enumerate(record.values()):
+                if value is None:
+                    formatted_value = ""
+                elif col == 2 or col == 3:
+                    formatted_value = str(Decimal(value).quantize(format_balance, rounding=ROUND_DOWN))
+                else:
+                    formatted_value = str(value)
+                self.table_main.setItem(row, col, QTableWidgetItem(formatted_value))
 
+    def get_orders(self):
+        pass
+
+    def send_buy(self):
+        pass
+
+    def send_sell(self):
+        pass
+
+def create_application():
+    """Запуск модуля основного приложения"""
+    app = QApplication(sys.argv)
+    main_window = OKXTradeMainWindow()
+    main_window.show()
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
-    api = start_api()
-    balance = get_balace_trade(api)
-    show_balance_trade(balance)
-    #show_json(balance)
+    create_application()
