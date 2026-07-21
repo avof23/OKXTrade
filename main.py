@@ -1,4 +1,3 @@
-import os
 import sys
 from decimal import Decimal, ROUND_DOWN
 
@@ -130,7 +129,42 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
                 self.table_main.setItem(row, col, QTableWidgetItem(formatted_value))
 
     def get_orders(self):
-        pass
+        """Получение всех активных ордеров с выводом в таблицу"""
+        self.table_main = self.ui.tableWidget_main
+        self.table_main.clear()
+
+        self.table_main.setColumnCount(8)
+        self.table_main.setColumnWidth(3, 150)
+        self.table_main.setColumnWidth(4, 150)
+        self.table_main.setHorizontalHeaderLabels(["Ticker", "Date-Time", "Type", "Price", "Amount", "Total_USDT", "Status", "ID", "Actions"])
+
+        try:
+            data = self.okx_client_api.get_orders()
+
+        except OKXAPIError as e:
+            self.ui.statusbar.setStyleSheet("color: red;")
+            self.ui.statusbar.showMessage(str(e))
+            return
+
+        except Exception as e:
+            self.ui.statusbar.setStyleSheet("color: red;")
+            self.ui.statusbar.showMessage(f"System error: {str(e)}")
+            return
+
+        self.ui.statusbar.setStyleSheet("color: green;")
+        self.ui.statusbar.showMessage(f"Successful get orders", 5000)
+        self.table_main.setRowCount(len(data))
+
+        for row, record in enumerate(data):
+            for col, value in enumerate(record.values()):
+                if value is None:
+                    formatted_value = ""
+                elif col == 3 or col == 4:
+                    formatted_value = str(Decimal(value).quantize(format_balance, rounding=ROUND_DOWN))
+                else:
+                    formatted_value = str(value)
+                self.table_main.setItem(row, col, QTableWidgetItem(formatted_value))
+            self.table_main.setItem(row, 8, QTableWidgetItem("cancel"))
 
     def send_order(self, side: str):
         ticker = self.ui.editline_ticker.text().strip()

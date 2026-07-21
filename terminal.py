@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 import sys
 
 from dotenv import load_dotenv
@@ -153,6 +154,42 @@ class OkxApiInterface():
             return data[0].get("ordId")
 
         return None
+
+    def get_orders(self):
+        """
+        Получить все активные ордера
+        """
+        result_orders_list = self.trade_api.get_order_list(instType="SPOT", ordType="limit,market")
+
+        if result_orders_list.get("code") != "0":
+            error_msg = result_orders_list.get('msg', 'Unknown error')
+            raise OKXAPIError(f"Error OKX: {error_msg}")
+
+        data = result_orders_list.get("data")
+        if not data:
+            return []
+
+        parsed_orders = []
+
+        for order in data:
+            c_time_ms = int(order.get("cTime", 0))
+            date_str = datetime.fromtimestamp(c_time_ms / 1000.0).strftime("%Y-%m-%d %H:%M:%S") if c_time_ms > 0 else ""
+            price = float(order.get("px", 0)) if order.get("px") else 0.0
+            amount = float(order.get("sz", 0)) if order.get("sz") else 0.0
+            total_usdt = price * amount
+
+            parsed_orders.append({
+                "ticker": order.get("instId", "Unknown"),
+                "date": date_str,
+                "type": order.get("side"),
+                "price": price,
+                "amount": amount,
+                "total_usdt": total_usdt,
+                "status": order.get("state", ""),
+                "ID": order.get("ordId"),
+            })
+
+            return parsed_orders
 
     # Модуль для чтения рыночных данных (стаканы, цены)
     # market_api = MarketData.MarketAPI(use_server_time=False, flag=flag)
