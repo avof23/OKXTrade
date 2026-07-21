@@ -2,7 +2,7 @@ import sys
 from decimal import Decimal, ROUND_DOWN
 
 from PyQt6 import QtWidgets
-from PyQt6.QtWidgets import QApplication, QTableWidgetItem, QMessageBox
+from PyQt6.QtWidgets import QApplication, QTableWidgetItem, QMessageBox, QPushButton
 from PyQt6.QtGui import QRegularExpressionValidator
 from PyQt6.QtCore import QRegularExpression
 
@@ -60,7 +60,7 @@ class OKXTransferForm(QtWidgets.QDialog):
             self.accept()
         except OKXAPIError as e:
             self.ui.btn_OK.setEnabled(True)
-            QMessageBox.critical(self, str(e))
+            QMessageBox.critical(self, "Error", str(e))
 
 
 class OKXTradeMainWindow(QtWidgets.QMainWindow):
@@ -86,9 +86,10 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         self.ui.editline_amount_usdt.setValidator(validator)
         self.ui.editline_amount_crypto.setValidator(validator)
 
+        self.table_main = self.ui.tableWidget_main
+
     def get_ballance(self):
         """Получение баланса с выводом в таблицу"""
-        self.table_main = self.ui.tableWidget_main
         self.table_main.clear()
 
         self.table_main.setColumnCount(3)
@@ -130,13 +131,21 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
 
     def get_orders(self):
         """Получение всех активных ордеров с выводом в таблицу"""
-        self.table_main = self.ui.tableWidget_main
         self.table_main.clear()
 
-        self.table_main.setColumnCount(8)
-        self.table_main.setColumnWidth(3, 150)
-        self.table_main.setColumnWidth(4, 150)
-        self.table_main.setHorizontalHeaderLabels(["Ticker", "Date-Time", "Type", "Price", "Amount", "Total_USDT", "Status", "ID", "Actions"])
+        self.table_main.setColumnCount(9)
+        self.table_main.setColumnWidth(0, 100)
+        self.table_main.setColumnWidth(1, 150)
+        self.table_main.setColumnWidth(2, 30)
+        self.table_main.setColumnWidth(3, 100)
+        self.table_main.setColumnWidth(4, 100)
+        self.table_main.setColumnWidth(5, 100)
+        self.table_main.setColumnWidth(6, 50)
+        self.table_main.setColumnWidth(7, 50)
+        self.table_main.setColumnWidth(8, 50)
+        self.table_main.setHorizontalHeaderLabels(["Ticker", "Date-Time", "Type",
+                                                   "Price", "Amount", "Total_USDT",
+                                                   "Status", "ID", "Actions"])
 
         try:
             data = self.okx_client_api.get_orders()
@@ -164,7 +173,13 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
                 else:
                     formatted_value = str(value)
                 self.table_main.setItem(row, col, QTableWidgetItem(formatted_value))
-            self.table_main.setItem(row, 8, QTableWidgetItem("cancel"))
+
+            cancel_btn = QPushButton("del")
+            cancel_btn.setStyleSheet("color: red; font-weight: bold;")
+            ordid = self.table_main.item(row, 7).text()
+            ordticker = self.table_main.item(row, 0).text()
+            cancel_btn.clicked.connect(lambda checked, t=ordticker, oid=ordid: self.on_cancel_clicked(t, oid))
+            self.table_main.setCellWidget(row, 8, cancel_btn)
 
     def send_order(self, side: str):
         ticker = self.ui.editline_ticker.text().strip()
@@ -218,6 +233,10 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
 
             self.ui.statusbar.setStyleSheet("color: green;")
             self.ui.statusbar.showMessage(f"Successful, The order was successfully placed! ID: {order_id}")
+            self.ui.editline_ticker.setText("")
+            self.ui.editline_price.setText("")
+            self.ui.editline_amount_usdt.setText("")
+            self.ui.editline_amount_crypto.setText("")
 
         except ValueError:
             self.ui.statusbar.setStyleSheet("color: red;")
@@ -240,6 +259,32 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
             self.ui.statusbar.setStyleSheet("color: blue;")
             self.ui.statusbar.showMessage(status_result, 5000)
 
+    def on_cancel_clicked(self, ticker: str, order_id: str):
+        """Обработчик нажатия на кнопку"""
+
+        reply = QMessageBox.question(self,
+                                     "Confirmation",
+                                     f"Are you shure cancel this order {order_id}?",
+                                     QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
+                                     QMessageBox.StandardButton.No)
+
+        if reply == QMessageBox.StandardButton.Yes:
+            success = self.okx_client_api.cancel_spot_order(ticker, order_id)
+
+            if success:
+                self.remove_row_by_order_id(order_id)
+            else:
+                self.ui.statusbar.setStyleSheet("color: red;")
+                self.ui.statusbar.showMessage("Error, The order could not be canceled on the exchange.")
+
+    def remove_row_by_order_id(self, order_id: str):
+        """Безопасный поиск и удаление строки по ID ордера"""
+        for row in range(self.table_main.rowCount()):
+            item = self.table_main.item(row, 7)
+            if item and item.text() == order_id:
+                self.table_main.removeRow(row)
+                break
+
 
 def create_application():
     """Запуск модуля основного приложения"""
@@ -247,6 +292,7 @@ def create_application():
     main_window = OKXTradeMainWindow()
     main_window.show()
     sys.exit(app.exec())
+
 
 if __name__ == "__main__":
     create_application()

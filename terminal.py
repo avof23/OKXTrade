@@ -1,14 +1,12 @@
 import os
 from datetime import datetime
-import sys
 
 from dotenv import load_dotenv
-from decimal import Decimal, ROUND_DOWN
 
 import okx.Account as Account
 import okx.Funding as Funding
 import okx.Trade as Trade
-import okx.MarketData as MarketData
+# import okx.MarketData as MarketData
 
 
 load_dotenv()
@@ -18,19 +16,19 @@ PASSPHRASE = os.getenv("PASSPHRASE")
 
 # flag='0' — реальные торги, flag='1' — демо-режим (песочница)
 flag = '1'
-format_balance = Decimal("0.00001")
 
 
 class OKXAPIError(Exception):
     pass
 
-class OkxApiInterface():
+
+class OkxApiInterface:
     def __init__(self):
         self.account_api = Account.AccountAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.funding_api = Funding.FundingAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.trade_api = Trade.TradeAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
 
-    def get_balace_trade(self):
+    def get_balace_trade(self) -> list:
         """
         Получить баланс по trading аккаунту
         """
@@ -52,7 +50,7 @@ class OkxApiInterface():
             "balanceUSD": val.get("eqUsd", "0"),
         } for val in details]
 
-    def get_balance_funding(self):
+    def get_balance_funding(self) -> list:
         """
         Получить баланс по основному аккаунту
         """
@@ -72,7 +70,7 @@ class OkxApiInterface():
             "availBal": asset.get("availBal")
         } for asset in data]
 
-    def transfer_funds(self, currency, amount, direction="to_trade"):
+    def transfer_funds(self, currency: str, amount: str, direction: str = "to_trade"):
         """
         Переводит средства между Основным и Торговым счетами.
 
@@ -108,11 +106,7 @@ class OkxApiInterface():
 
         return None
 
-    def get_price_ticker(self, ticker: str) -> str:
-        result_ticker = self.account_api.get_ticker(instType="SPOT", instId=ticker)
-        return result_ticker
-
-    def place_spot_order(self, inst_id, side, ord_type, amount_str, price_str=None, is_usdt=False):
+    def place_spot_order(self, inst_id: str, side: str, ord_type: str, amount_str: str, price_str=None, is_usdt=False):
         """
         Отправляет SPOT ордер.
         :param inst_id: Тикер, например "BTC-USDT"
@@ -155,7 +149,7 @@ class OkxApiInterface():
 
         return None
 
-    def get_orders(self):
+    def get_orders(self) -> list:
         """
         Получить все активные ордера
         """
@@ -191,5 +185,10 @@ class OkxApiInterface():
 
             return parsed_orders
 
-    # Модуль для чтения рыночных данных (стаканы, цены)
-    # market_api = MarketData.MarketAPI(use_server_time=False, flag=flag)
+    def cancel_spot_order(self, tik: str, order_id: str):
+        result_cancel = self.trade_api.cancel_order(instId=tik, ordId=order_id)
+
+        if result_cancel.get("code") != "0":
+            error_msg = result_cancel.get('msg', 'Unknown error')
+            raise OKXAPIError(f"Error OKX: {error_msg}")
+        return True
