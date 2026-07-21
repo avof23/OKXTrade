@@ -31,35 +31,6 @@
      <string>Header</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="rb_main">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>50</y>
-      <width>100</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Main Acc.</string>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="rb_trade">
-    <property name="geometry">
-     <rect>
-      <x>120</x>
-      <y>50</y>
-      <width>100</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Trade Acc.</string>
-    </property>
-   </widget>
    <widget class="QPushButton" name="btn_getbal">
     <property name="geometry">
      <rect>
@@ -107,36 +78,7 @@
      <string>Open New Order</string>
     </property>
    </widget>
-   <widget class="QRadioButton" name="rb_market">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>460</y>
-      <width>70</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Market</string>
-    </property>
-   </widget>
-   <widget class="QRadioButton" name="rb_limit">
-    <property name="geometry">
-     <rect>
-      <x>90</x>
-      <y>460</y>
-      <width>70</width>
-      <height>24</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Limit</string>
-    </property>
-    <property name="checked">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="editline_simbol">
+   <widget class="QLineEdit" name="editline_ticker">
     <property name="geometry">
      <rect>
       <x>70</x>
@@ -150,6 +92,9 @@
       <bold>true</bold>
      </font>
     </property>
+    <property name="maxLength">
+     <number>10</number>
+    </property>
    </widget>
    <widget class="QLabel" name="label_simbol">
     <property name="geometry">
@@ -161,7 +106,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>Simbol:</string>
+     <string>Ticker:</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_price">
@@ -180,24 +125,27 @@
    <widget class="QLineEdit" name="editline_price">
     <property name="geometry">
      <rect>
-      <x>200</x>
+      <x>190</x>
       <y>500</y>
       <width>70</width>
       <height>26</height>
      </rect>
     </property>
+    <property name="maxLength">
+     <number>10</number>
+    </property>
    </widget>
    <widget class="QLabel" name="label_count">
     <property name="geometry">
      <rect>
-      <x>280</x>
+      <x>270</x>
       <y>505</y>
       <width>50</width>
       <height>18</height>
      </rect>
     </property>
     <property name="text">
-     <string>Count:</string>
+     <string>Amount:</string>
     </property>
    </widget>
    <widget class="Line" name="line">
@@ -213,7 +161,7 @@
      <enum>Qt::Vertical</enum>
     </property>
    </widget>
-   <widget class="QLineEdit" name="editline_fiat">
+   <widget class="QLineEdit" name="editline_amount_usdt">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -222,8 +170,11 @@
       <height>26</height>
      </rect>
     </property>
+    <property name="maxLength">
+     <number>10</number>
+    </property>
    </widget>
-   <widget class="QLineEdit" name="editline_cur">
+   <widget class="QLineEdit" name="editline_amount_crypto">
     <property name="geometry">
      <rect>
       <x>340</x>
@@ -231,6 +182,9 @@
       <width>70</width>
       <height>26</height>
      </rect>
+    </property>
+    <property name="maxLength">
+     <number>10</number>
     </property>
    </widget>
    <widget class="QLabel" name="label_inusdt">
@@ -263,7 +217,7 @@
     <property name="geometry">
      <rect>
       <x>520</x>
-      <y>470</y>
+      <y>480</y>
       <width>80</width>
       <height>26</height>
      </rect>
@@ -288,7 +242,7 @@
     <property name="geometry">
      <rect>
       <x>520</x>
-      <y>510</y>
+      <y>515</y>
       <width>80</width>
       <height>26</height>
      </rect>
@@ -327,6 +281,110 @@
       <height>331</height>
      </rect>
     </property>
+   </widget>
+   <widget class="QPushButton" name="btn_transfer">
+    <property name="geometry">
+     <rect>
+      <x>460</x>
+      <y>50</y>
+      <width>100</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Transfer</string>
+    </property>
+    <property name="icon">
+     <iconset theme="x-office-presentation">
+      <normaloff>.</normaloff>.</iconset>
+    </property>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_acc">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>221</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QRadioButton" name="rb_main">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>100</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Main Acc.</string>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rb_trade">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>10</y>
+       <width>100</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Trade Acc.</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_ord">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>450</y>
+      <width>201</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="title">
+     <string/>
+    </property>
+    <widget class="QRadioButton" name="rb_market">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>10</y>
+       <width>70</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Market</string>
+     </property>
+    </widget>
+    <widget class="QRadioButton" name="rb_limit">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>10</y>
+       <width>70</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Limit</string>
+     </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

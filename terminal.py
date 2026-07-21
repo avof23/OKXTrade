@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 
@@ -30,17 +29,10 @@ class OkxApiInterface():
         self.funding_api = Funding.FundingAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.trade_api = Trade.TradeAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
 
-    # def start_api(self):
-    #     account_api = Account.AccountAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
-    #     return account_api
-
-    def show_json(self, datajson):
-        """Показать полный dump json данных"""
-        beautiful_json = json.dumps(datajson, indent=4, ensure_ascii=False)
-        print(beautiful_json)
-
     def get_balace_trade(self):
-        """Получить баланс по trading аккаунту"""
+        """
+        Получить баланс по trading аккаунту
+        """
         result_trading_balance = self.account_api.get_account_balance()
 
         if result_trading_balance.get("code") != "0":
@@ -60,7 +52,9 @@ class OkxApiInterface():
         } for val in details]
 
     def get_balance_funding(self):
-        """Получить баланс по основному аккаунту"""
+        """
+        Получить баланс по основному аккаунту
+        """
         result_funding_balance = self.funding_api.get_balances()
 
         if result_funding_balance.get("code") != "0":
@@ -77,13 +71,88 @@ class OkxApiInterface():
             "availBal": asset.get("availBal")
         } for asset in data]
 
-    def show_balance_trade(self, short_balance):
-        for item in short_balance:
-            print(f'{item["ticker"]} = {Decimal(item["balance"]).quantize(format_balance, rounding=ROUND_DOWN)}')
+    def transfer_funds(self, currency, amount, direction="to_trade"):
+        """
+        Переводит средства между Основным и Торговым счетами.
+
+        :param currency: Тикер монеты, например "USDT"
+        :param amount: Сумма перевода в виде строки, например "10.5"
+        :param direction: Направление. "to_trade" (на торговый) или "to_funding" (на основной)
+        """
+        # Определяем коды счетов в зависимости от направления
+        if direction == "to_trade":
+            account_from = "6"  # С Основного
+            account_to = "18"  # На Торговый
+        elif direction == "to_funding":
+            account_from = "18"  # С Торгового
+            account_to = "6"  # На Основной
+        else:
+            raise ValueError("Unknown transfer directions")
+
+        response = self.funding_api.funds_transfer(
+            ccy=currency,
+            amt=str(amount),
+            from_=account_from,
+            to=account_to
+        )
+
+        if response.get("code") != "0":
+            error_msg = response.get('msg', 'Unknown transfer error')
+            raise OKXAPIError(f"Error transfer OKX: {error_msg}")
+
+        data = response.get("data", [])
+        if data:
+            trans_id = data[0].get("transId")
+            return trans_id
+
+        return None
 
     def get_price_ticker(self, ticker: str) -> str:
         result_ticker = self.account_api.get_ticker(instType="SPOT", instId=ticker)
         return result_ticker
+
+    def place_spot_order(self, inst_id, side, ord_type, amount_str, price_str=None, is_usdt=False):
+        """
+        Отправляет SPOT ордер.
+        :param inst_id: Тикер, например "BTC-USDT"
+        :param side: Направление: "buy" или "sell"
+        :param ord_type: Тип ордера: "market" или "limit"
+        :param amount_str: Количество или сумма (строка)
+        :param price_str: Цена ордера (только для лимитных)
+        :param is_usdt: True, если amount_str указан в USDT, False если в крипте
+        """
+        params = {
+            "instId": inst_id.upper(),
+            "tdMode": "cash",  # cash = SPOT торговля
+            "side": side,
+            "ordType": ord_type,
+            "sz": amount_str
+        }
+
+        if ord_type == "limit":
+            if not price_str:
+                raise OKXAPIError("For a limit order, you must specify a price.")
+
+            if is_usdt:
+                calculated_size = float(amount_str) / float(price_str)
+                params["sz"] = str(calculated_size)
+
+            params["px"] = price_str
+
+        elif ord_type == "market":
+            params["tgtCcy"] = "quote_ccy" if is_usdt else "base_ccy"
+
+        response = self.trade_api.place_order(**params)
+
+        if response.get("code") != "0":
+            error_msg = response.get("msg", "Unknown error")
+            raise OKXAPIError(f"Order Error: {error_msg}")
+
+        data = response.get("data", [])
+        if data:
+            return data[0].get("ordId")
+
+        return None
 
     # Модуль для чтения рыночных данных (стаканы, цены)
     # market_api = MarketData.MarketAPI(use_server_time=False, flag=flag)
