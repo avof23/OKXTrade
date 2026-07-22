@@ -23,7 +23,7 @@ class OKXTransferForm(QtWidgets.QDialog):
         self.api = api_client
         self.result_message = ""
 
-        regex = QRegularExpression(r"^[0-9]+([.,][0-9]{1,8})?$")
+        regex = QRegularExpression(r"^[0-9]+([.,][0-9]{1,18})?$")
         validator = QRegularExpressionValidator(regex)
         self.ui.editline_amount.setValidator(validator)
         self.ui.btn_OK.clicked.connect(self.send_transfer)
@@ -83,7 +83,7 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         self.ui.btn_exit.clicked.connect(QtWidgets.QApplication.instance().quit)
 
         # LineEdit configuration
-        regex = QRegularExpression(r"^[0-9]+([.,][0-9]{1,8})?$")
+        regex = QRegularExpression(r"^[0-9]+([.,][0-9]{1,10})?$")
         validator = QRegularExpressionValidator(regex)
         self.ui.editline_price.setValidator(validator)
         self.ui.editline_amount_usdt.setValidator(validator)
