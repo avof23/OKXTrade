@@ -11,7 +11,8 @@ from QDesign.tranfer_iface import Ui_Dialog
 from terminal import OkxApiInterface, OKXAPIError
 
 format_balance = Decimal("0.00001")
-
+app_name = "OKX Trading Assistant"
+__version__ = "1.2.0"
 
 class OKXTransferForm(QtWidgets.QDialog):
     """Класс окна формы для трансфера между счетами"""
@@ -74,6 +75,10 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         self.ui.setupUi(self)
         self.okx_client_api = OkxApiInterface()
 
+        # Headers
+        self.ui.label_head.setText("Simple Trading Assistant for OKX Market")
+        self.setWindowTitle(f"{app_name} — ver {__version__}")
+
         # Btn Configuration
         self.ui.btn_getbal.clicked.connect(self.get_ballance)
         self.ui.btn_getord.clicked.connect(self.get_orders)
@@ -91,8 +96,6 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
 
         self.table_main = self.ui.tableWidget_main
 
-        # Header
-        self.ui.label_head.setText("Simple Trading Application for OKX Market")
 
     def get_ballance(self):
         """Получение баланса с выводом в таблицу"""
@@ -101,7 +104,7 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         self.table_main.setColumnCount(3)
         self.table_main.setColumnWidth(1, 200)
         self.table_main.setColumnWidth(2, 200)
-        self.table_main.setHorizontalHeaderLabels(["Ticker", "Balance", "Balance in USD"])
+        self.table_main.setHorizontalHeaderLabels(["Ticker", "Balance", "Balance in USDT"])
 
         try:
             if self.ui.rb_main.isChecked():
@@ -123,17 +126,22 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
 
         self.ui.statusbar.setStyleSheet("color: green;")
         self.ui.statusbar.showMessage(f"Successful get balance", 5000)
-        self.table_main.setRowCount(len(data))
+        self.table_main.setRowCount(len(data)+1) #Доп строка для вывода суммы
+        balance_summe = 0.00
 
         for row, record in enumerate(data):
             for col, value in enumerate(record.values()):
                 if value is None:
                     formatted_value = ""
-                elif col == 2 or col == 3:
+                elif col == 1 or col == 2:
                     formatted_value = str(Decimal(value).quantize(format_balance, rounding=ROUND_DOWN))
                 else:
                     formatted_value = str(value)
                 self.table_main.setItem(row, col, QTableWidgetItem(formatted_value))
+            balance_summe += float(self.table_main.item(row, 2).text())
+        row_forsumm = len(data)
+        self.table_main.setItem(row_forsumm, 0, self.create_bold_item("Total:"))
+        self.table_main.setItem(row_forsumm, 2, self.create_bold_item(str(round(balance_summe, 2))))
 
     def get_orders(self):
         """Получение всех активных ордеров с выводом в таблицу"""
@@ -291,6 +299,13 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
             if item and item.text() == order_id:
                 self.table_main.removeRow(row)
                 break
+
+    def create_bold_item(self, text: str) -> QTableWidgetItem:
+        item = QTableWidgetItem(text)
+        font = item.font()
+        font.setBold(True)
+        item.setFont(font)
+        return item
 
 
 def create_application():

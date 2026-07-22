@@ -102,6 +102,7 @@ class Ui_MainWindow(object):
         self.btn_exit.setObjectName("btn_exit")
         self.tableWidget_main = QtWidgets.QTableWidget(parent=self.centralwidget)
         self.tableWidget_main.setGeometry(QtCore.QRect(10, 90, 781, 331))
+        self.tableWidget_main.setEditTriggers(QtWidgets.QAbstractItemView.EditTrigger.NoEditTriggers)
         self.tableWidget_main.setObjectName("tableWidget_main")
         self.tableWidget_main.setColumnCount(0)
         self.tableWidget_main.setRowCount(0)
@@ -143,7 +144,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Light OKX Trade"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "OKX Trading Assistant"))
         self.label_head.setText(_translate("MainWindow", "Header"))
         self.btn_getbal.setText(_translate("MainWindow", "Get Balance"))
         self.btn_getord.setText(_translate("MainWindow", "Get Orders"))

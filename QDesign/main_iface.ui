@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Light OKX Trade</string>
+   <string>OKX Trading Assistant</string>
   </property>
   <property name="windowIcon">
    <iconset theme="preferences-system-network">
@@ -300,6 +300,9 @@
       <width>781</width>
       <height>331</height>
      </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
     </property>
    </widget>
    <widget class="QPushButton" name="btn_transfer">

@@ -1,21 +1,21 @@
 import os
 from datetime import datetime
+import time
 
 from dotenv import load_dotenv
 
 import okx.Account as Account
 import okx.Funding as Funding
 import okx.Trade as Trade
-# import okx.MarketData as MarketData
+import okx.MarketData as MarketData
 
 
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 SECRET_KEY = os.getenv("SECRET_KEY")
 PASSPHRASE = os.getenv("PASSPHRASE")
-
+flag = os.getenv("FLAG")
 # flag='0' — реальные торги, flag='1' — демо-режим (песочница)
-flag = '1'
 
 
 class OKXAPIError(Exception):
@@ -29,6 +29,37 @@ class OkxApiInterface:
         self.account_api = Account.AccountAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.funding_api = Funding.FundingAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.trade_api = Trade.TradeAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
+        self.market_api = MarketData.MarketAPI(flag=flag)
+
+        self.CACHE_TTL = 300
+        self.price_cache = {}
+
+    def get_ticker_price(self, ticker: str) -> float:
+        """Получаем актуальные цены с биржи и сохраняем в локальный кэш"""
+        if ticker == "USDT" or ticker == "USD":
+            return 1.00
+
+        if ticker in self.price_cache:
+            cached_data = self.price_cache[ticker]
+            if time.time() - cached_data["time"] < self.CACHE_TTL:
+                return cached_data["price"]
+
+        try:
+            result = self.market_api.get_index_tickers(instId=f"{ticker}-USDT")
+            if result.get("code") == "0" and result.get("data"):
+                ticker_data = result.get("data", [])[0]
+                last_price = float(ticker_data.get("idxPx", 0.00))
+            else:
+                last_price = 0.00
+        except Exception:
+            last_price = 0.00
+
+        self.price_cache[ticker] = {
+            "price": last_price,
+            "time": time.time()
+        }
+
+        return last_price
 
     def get_balace_trade(self) -> list:
         """Получить баланс по trading аккаунту"""
@@ -47,7 +78,7 @@ class OkxApiInterface:
         return [{
             "ticker": val.get("ccy", "Unknown"),
             "balance": val.get("eq", "0"),
-            "balanceUSD": val.get("eqUsd", "0"),
+            "balanceUSDT": float(val.get("eq")) * self.get_ticker_price(val.get("ccy")), # "balanceUSDT": val.get("eqUsd", "0"),
         } for val in details]
 
     def get_balance_funding(self) -> list:
@@ -65,7 +96,7 @@ class OkxApiInterface:
         return [{
             "ticker": asset.get("ccy"),
             "balance": asset.get("bal"),
-            "availBal": asset.get("availBal")
+            "balanceUSDT": float(asset.get("bal")) * self.get_ticker_price(asset.get("ccy"))
         } for asset in data]
 
     def transfer_funds(self, currency: str, amount: str, direction: str = "to_trade"):
