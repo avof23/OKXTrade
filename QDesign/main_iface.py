@@ -148,7 +148,7 @@ class Ui_MainWindow(object):
         self.btn_getbal.setText(_translate("MainWindow", "Get Balance"))
         self.btn_getord.setText(_translate("MainWindow", "Get Orders"))
         self.label_neword.setText(_translate("MainWindow", "Open New Order"))
-        self.editline_ticker.setToolTip(_translate("MainWindow", "<html><head/><body><p>Example BTC-USDT</p></body></html>"))
+        self.editline_ticker.setToolTip(_translate("MainWindow", "<html><head/><body><p>Example: BTC-USDT</p></body></html>"))
         self.label_simbol.setText(_translate("MainWindow", "Ticker:"))
         self.label_price.setText(_translate("MainWindow", "Price:"))
         self.label_count.setText(_translate("MainWindow", "Amount:"))
