@@ -96,9 +96,14 @@
     <rect>
      <x>90</x>
      <y>140</y>
-     <width>113</width>
+     <width>141</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>20</pointsize>
+    </font>
    </property>
    <property name="maxLength">
     <number>10</number>

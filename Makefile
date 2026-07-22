@@ -5,4 +5,4 @@ req:
 prepare:
 		pip install -r requirements.txt
 run:
-		export PYTHONPATH=$$PWD && $(PYTHON) src/main.py
+		export PYTHONPATH=$$PWD && $(PYTHON) main.py

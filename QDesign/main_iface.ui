@@ -17,6 +17,9 @@
    <iconset theme="preferences-system-network">
     <normaloff>.</normaloff>.</iconset>
   </property>
+  <property name="toolTip">
+   <string/>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QLabel" name="label_head">
     <property name="geometry">
@@ -80,6 +83,11 @@
       <height>31</height>
      </rect>
     </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
     <property name="text">
      <string>Open New Order</string>
     </property>
@@ -97,6 +105,12 @@
      <font>
       <bold>true</bold>
      </font>
+    </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Example BTC-USDT&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="toolTipDuration">
+     <number>0</number>
     </property>
     <property name="maxLength">
      <number>10</number>
@@ -138,7 +152,7 @@
      </rect>
     </property>
     <property name="maxLength">
-     <number>10</number>
+     <number>12</number>
     </property>
    </widget>
    <widget class="QLabel" name="label_count">
@@ -177,7 +191,7 @@
      </rect>
     </property>
     <property name="maxLength">
-     <number>10</number>
+     <number>12</number>
     </property>
    </widget>
    <widget class="QLineEdit" name="editline_amount_crypto">
@@ -190,7 +204,7 @@
      </rect>
     </property>
     <property name="maxLength">
-     <number>10</number>
+     <number>12</number>
     </property>
    </widget>
    <widget class="QLabel" name="label_inusdt">
@@ -216,7 +230,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>in currency</string>
+     <string>in crypto</string>
     </property>
    </widget>
    <widget class="QPushButton" name="btn_buy">

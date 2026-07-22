@@ -180,7 +180,7 @@ class OkxApiInterface:
                 "ID": order.get("ordId"),
             })
 
-            return parsed_orders
+        return parsed_orders
 
     def cancel_spot_order(self, tik: str, order_id: str):
         """

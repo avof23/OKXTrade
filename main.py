@@ -250,10 +250,10 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
             self.ui.statusbar.showMessage("Error, The “Amount” and “Price” fields must contain only numbers.")
         except OKXAPIError as e:
             self.ui.statusbar.setStyleSheet("color: red;")
-            self.ui.statusbar.showMessage("API Error", str(e))
+            self.ui.statusbar.showMessage(f"API Error {str(e)}")
         except Exception as e:
             self.ui.statusbar.setStyleSheet("color: red;")
-            self.ui.statusbar.showMessage("System error", str(e))
+            self.ui.statusbar.showMessage(f"System error {str(e)}")
         finally:
             self.ui.btn_buy.setEnabled(True)
             self.ui.btn_sell.setEnabled(True)
