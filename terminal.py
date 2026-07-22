@@ -23,15 +23,15 @@ class OKXAPIError(Exception):
 
 
 class OkxApiInterface:
+    """Класс бизнес логики, Инициализация API интерфейса и
+    обработка всех запросов на биржу"""
     def __init__(self):
         self.account_api = Account.AccountAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.funding_api = Funding.FundingAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.trade_api = Trade.TradeAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
 
     def get_balace_trade(self) -> list:
-        """
-        Получить баланс по trading аккаунту
-        """
+        """Получить баланс по trading аккаунту"""
         result_trading_balance = self.account_api.get_account_balance()
 
         if result_trading_balance.get("code") != "0":
@@ -51,9 +51,7 @@ class OkxApiInterface:
         } for val in details]
 
     def get_balance_funding(self) -> list:
-        """
-        Получить баланс по основному аккаунту
-        """
+        """Получить баланс по основному аккаунту"""
         result_funding_balance = self.funding_api.get_balances()
 
         if result_funding_balance.get("code") != "0":
@@ -150,9 +148,8 @@ class OkxApiInterface:
         return None
 
     def get_orders(self) -> list:
-        """
-        Получить все активные ордера
-        """
+        """Получить все активные ордера по SPOT торговле"""
+
         result_orders_list = self.trade_api.get_order_list(instType="SPOT", ordType="limit,market")
 
         if result_orders_list.get("code") != "0":
@@ -186,6 +183,11 @@ class OkxApiInterface:
             return parsed_orders
 
     def cancel_spot_order(self, tik: str, order_id: str):
+        """
+        Отмера активного ордера на SPOT торговле
+        :param tik: Тикер, например "BTC-USDT"
+        :param order_id: ID ордера размещенного в терминале"
+        """
         result_cancel = self.trade_api.cancel_order(instId=tik, ordId=order_id)
 
         if result_cancel.get("code") != "0":

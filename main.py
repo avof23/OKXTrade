@@ -14,6 +14,7 @@ format_balance = Decimal("0.00001")
 
 
 class OKXTransferForm(QtWidgets.QDialog):
+    """Класс окна формы для трансфера между счетами"""
     def __init__(self, api_client):
         super(OKXTransferForm, self).__init__()
         self.ui = Ui_Dialog()
@@ -29,6 +30,7 @@ class OKXTransferForm(QtWidgets.QDialog):
         self.ui.btn_cancel.clicked.connect(self.reject)
 
     def send_transfer(self):
+        """Проверка и отправка трансфера в метод бизнес логики"""
         try:
             self.ui.btn_OK.setEnabled(False)
             currency = self.ui.editline_currency.text().strip()
@@ -64,7 +66,7 @@ class OKXTransferForm(QtWidgets.QDialog):
 
 
 class OKXTradeMainWindow(QtWidgets.QMainWindow):
-    """Класс основной формы приложения"""
+    """Класс основной формы приложения, связь с бизнес логикой"""
 
     def __init__(self):
         super(OKXTradeMainWindow, self).__init__()
@@ -80,6 +82,7 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         self.ui.btn_sell.clicked.connect(lambda: self.send_order("sell"))
         self.ui.btn_exit.clicked.connect(QtWidgets.QApplication.instance().quit)
 
+        # LineEdit configuration
         regex = QRegularExpression(r"^[0-9]+([.,][0-9]{1,8})?$")
         validator = QRegularExpressionValidator(regex)
         self.ui.editline_price.setValidator(validator)
@@ -87,6 +90,9 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         self.ui.editline_amount_crypto.setValidator(validator)
 
         self.table_main = self.ui.tableWidget_main
+
+        # Header
+        self.ui.label_head.setText("Simple Trading Application for OKX Market")
 
     def get_ballance(self):
         """Получение баланса с выводом в таблицу"""
@@ -182,6 +188,7 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
             self.table_main.setCellWidget(row, 8, cancel_btn)
 
     def send_order(self, side: str):
+        """Размещение нового ордера в SPOPT торговле"""
         ticker = self.ui.editline_ticker.text().strip()
         if not ticker:
             self.ui.statusbar.setStyleSheet("color: red;")
@@ -252,7 +259,7 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
             self.ui.btn_sell.setEnabled(True)
 
     def open_transfer(self):
-        """Метод открывает окно переводов"""
+        """Метод открывает окно трансферов"""
         transfer_form = OKXTransferForm(self.okx_client_api)
         if transfer_form.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             status_result = transfer_form.result_message
@@ -260,7 +267,7 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
             self.ui.statusbar.showMessage(status_result, 5000)
 
     def on_cancel_clicked(self, ticker: str, order_id: str):
-        """Обработчик нажатия на кнопку"""
+        """Обработчик нажатия на кнопку удаления ордера"""
 
         reply = QMessageBox.question(self,
                                      "Confirmation",
