@@ -134,6 +134,9 @@ class Ui_MainWindow(object):
         self.rb_limit.setGeometry(QtCore.QRect(100, 10, 70, 24))
         self.rb_limit.setChecked(True)
         self.rb_limit.setObjectName("rb_limit")
+        self.btn_earn = QtWidgets.QPushButton(parent=self.centralwidget)
+        self.btn_earn.setGeometry(QtCore.QRect(570, 50, 80, 26))
+        self.btn_earn.setObjectName("btn_earn")
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(parent=MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -163,6 +166,7 @@ class Ui_MainWindow(object):
         self.rb_trade.setText(_translate("MainWindow", "Trade Acc."))
         self.rb_market.setText(_translate("MainWindow", "Market"))
         self.rb_limit.setText(_translate("MainWindow", "Limit"))
+        self.btn_earn.setText(_translate("MainWindow", "Earn"))
 
 
 if __name__ == "__main__":

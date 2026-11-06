@@ -13,3 +13,9 @@ Functional:
 - Add Summ for ballance viewing
 - Fix summ in USD on main account ballance
 - Move flag (demo/prod) in env variable
+
+Plan in version 1.3.0
+----
+- history orders
+- output crypto
+- Optimisation price and summ table viewing

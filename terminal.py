@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 import okx.Account as Account
 import okx.Funding as Funding
 import okx.Trade as Trade
+import okx.Finance.Savings as Savings
 import okx.MarketData as MarketData
 
 
@@ -29,6 +30,7 @@ class OkxApiInterface:
         self.account_api = Account.AccountAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.funding_api = Funding.FundingAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.trade_api = Trade.TradeAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
+        self.savings_api = Savings.SavingsAPI(API_KEY, SECRET_KEY, PASSPHRASE, use_server_time=False, flag=flag)
         self.market_api = MarketData.MarketAPI(flag=flag)
 
         self.CACHE_TTL = 300
@@ -223,5 +225,77 @@ class OkxApiInterface:
 
         if result_cancel.get("code") != "0":
             error_msg = result_cancel.get('msg', 'Unknown error')
+            raise OKXAPIError(f"Error OKX: {error_msg}")
+        return True
+
+    def execute_withdrawal(self, ccy, amt, to_addr, chain):
+        """
+        Вывод средств на внешний кошелек (On-Chain) из Белого Списка OKX.
+
+        :param ccy: Монета, например 'USDT' или 'BTC'
+        :param amt: Сумма вывода в виде строки, например '100'
+        :param to_addr: Адрес назначения из вашего Белого Списка
+        :param chain: Точное название сети OKX, например 'USDT-TRC20', 'USDT-ERC20' или 'USDT-Arbitrum One'
+        """
+        result = self.trade_api.withdrawal(
+            ccy=ccy,
+            amt=str(amt),
+            dest="4",  # "4" = On-chain вывод на внешний адрес
+            toAddr=to_addr,
+            chain=chain,
+            fee="1"  # Минимальная комиссия (для USDT TRC20 обычно "1").
+            # Можно передать значение комиссии сети или опустить, если OKX берет по умолчанию.
+        )
+
+        if result.get("code") != "0":
+            error_msg = result.get('msg', 'Unknown error')
+            raise OKXAPIError(f"Error OKX: {error_msg}")
+        return True
+
+    def earn_balance(self, ccy=None):
+        """
+        Получить текущие балансы и начисленные проценты в Simple Earn (Savings).
+
+        :param ccy: Необязательный параметр. Символ конкретной монеты, например 'USDT'.
+                    Если не указать (None), вернет балансы по всем имеющимся монетам в Earn.
+        :return: Словарь с ответом API OKX
+        """
+        params = {}
+        if ccy:
+            params['ccy'] = ccy
+
+        result_earn_balance = self.savings_api.get_saving_balance(**params)
+
+        if result_earn_balance.get("code") != "0":
+            error_msg = result_earn_balance.get('msg', 'Unknown error')
+            raise OKXAPIError(f"Error OKX: {error_msg}")
+
+        data = result_earn_balance.get("data")
+        if not data:
+            return []
+
+        return [{
+            "ticker": asset.get("ccy"),
+            "amount": asset.get("amt"),
+            "earnings": asset.get("earnings")
+        } for asset in data]
+
+    def send_earn_order(self, ccy, amt, side):
+        """
+        Вложить/Вывести активы в Simple Earn (Flexible)
+
+        :param ccy: Монета
+        :param amt: Сумма в виде строки
+        :param side: Направление операции purchase/redempt
+        """
+        result = self.savings_api.savings_purchase_redemption(
+            ccy=ccy,
+            amt=str(amt),
+            side=side,  # "purchase" = положить в стейкинг, "redempt" = изъять из стейкинга
+            rate="1.00"  # Минимальная процентная ставка APY
+        )
+
+        if result.get("code") != "0":
+            error_msg = result.get('msg', 'Unknown error')
             raise OKXAPIError(f"Error OKX: {error_msg}")
         return True

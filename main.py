@@ -8,11 +8,12 @@ from PyQt6.QtCore import QRegularExpression
 
 from QDesign.main_iface import Ui_MainWindow
 from QDesign.tranfer_iface import Ui_Dialog
+from QDesign.earn_iface import Ui_EarnDialog
 from terminal import OkxApiInterface, OKXAPIError
 
 format_balance = Decimal("0.00001")
 app_name = "OKX Trading Assistant"
-__version__ = "1.2.0"
+__version__ = "1.3.0"
 
 class OKXTransferForm(QtWidgets.QDialog):
     """Класс окна формы для трансфера между счетами"""
@@ -66,6 +67,90 @@ class OKXTransferForm(QtWidgets.QDialog):
             QMessageBox.critical(self, "Error", str(e))
 
 
+class OKXWithdrowForm(QtWidgets.QDialog):
+    """Класс окна формы для вывода средств наружу"""
+    def __init__(self):
+        pass
+
+
+class OKXEarnForm(QtWidgets.QDialog):
+    """Класс окна формы управления Earn"""
+    def __init__(self, api_client):
+        super(OKXEarnForm, self).__init__()
+        self.ui = Ui_EarnDialog()
+        self.ui.setupUi(self)
+
+        self.api = api_client
+        self.result_message = ""
+
+        self.ui.btn_getE.clicked.connect(self.get_earn_balance)
+        self.ui.btn_depE.clicked.connect(lambda: self.earn_order("purchase"))
+        self.ui.btn_withE.clicked.connect(lambda: self.earn_order("redempt"))
+        self.ui.btn_close.clicked.connect(self.reject)
+
+    def get_earn_balance(self):
+        """Получение Earn баланса с выводом в таблицу"""
+        self.ui.table_balearn.clear()
+
+        self.ui.table_balearn.setColumnCount(3)
+        self.ui.table_balearn.setColumnWidth(1, 50)
+        self.ui.table_balearn.setColumnWidth(2, 100)
+        self.ui.table_balearn.setHorizontalHeaderLabels(["Ticker", "Amount", "Earning"])
+
+        try:
+            data = self.api.earn_balance()
+        except OKXAPIError as e:
+            QMessageBox.critical(self, "Error", str(e))
+            return
+
+        for row, record in enumerate(data):
+            for col, value in enumerate(record.values()):
+                if value is None:
+                    formatted_value = ""
+                elif col == 1 or col == 2:
+                    formatted_value = str(Decimal(value).quantize(format_balance, rounding=ROUND_DOWN))
+                else:
+                    formatted_value = str(value)
+                self.ui.table_balearn.setItem(row, col, QTableWidgetItem(formatted_value))
+
+    def earn_order(self, side: str):
+        ticker = self.ui.editline_symbol.text().strip()
+        if not ticker:
+            QMessageBox.critical(self, "Error", "Enter ticker (for example, USDT)")
+            return
+        amount_crypto = self.ui.editline_amount.text().strip().replace(',', '.')
+
+        if not amount_crypto:
+            QMessageBox.critical(self, "Error", "Error, Please specify the order size.")
+            return
+
+        try:
+            if float(amount_crypto) <= 0:
+                QMessageBox.critical(self, "Error", "Error The volume must be greater than zero.")
+                return
+
+            self.ui.btn_depE.setEnabled(False)
+            self.ui.btn_withE.setEnabled(False)
+
+            order_id = self.api.send_earn_order(ccy=ticker, amt=amount_crypto, side=side)
+
+            self.ui.editline_symbol.setText("")
+            self.ui.editline_amount.setText("")
+            self.result_message = f"Transfer successful! ID: {order_id}"
+            self.accept()
+            QMessageBox.information(self, "Successful", "Successful place earn")
+
+        except ValueError:
+            QMessageBox.critical(self, "Error", "Error, The “Amount” fields must contain only numbers.")
+        except OKXAPIError as e:
+            QMessageBox.critical(self, f"API Error {str(e)}")
+        except Exception as e:
+            QMessageBox.critical(self, f"System error {str(e)}")
+        finally:
+            self.ui.btn_depE.setEnabled(True)
+            self.ui.btn_withE.setEnabled(True)
+
+
 class OKXTradeMainWindow(QtWidgets.QMainWindow):
     """Класс основной формы приложения, связь с бизнес логикой"""
 
@@ -83,6 +168,7 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         self.ui.btn_getbal.clicked.connect(self.get_ballance)
         self.ui.btn_getord.clicked.connect(self.get_orders)
         self.ui.btn_transfer.clicked.connect(self.open_transfer)
+        self.ui.btn_earn.clicked.connect(self.open_earn)
         self.ui.btn_buy.clicked.connect(lambda: self.send_order("buy"))
         self.ui.btn_sell.clicked.connect(lambda: self.send_order("sell"))
         self.ui.btn_exit.clicked.connect(QtWidgets.QApplication.instance().quit)
@@ -271,6 +357,14 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         transfer_form = OKXTransferForm(self.okx_client_api)
         if transfer_form.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             status_result = transfer_form.result_message
+            self.ui.statusbar.setStyleSheet("color: blue;")
+            self.ui.statusbar.showMessage(status_result, 5000)
+
+    def open_earn(self):
+        """Метод открывает окно управления Earn"""
+        earn_form = OKXEarnForm(self.okx_client_api)
+        if earn_form.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            status_result = earn_form.result_message
             self.ui.statusbar.setStyleSheet("color: blue;")
             self.ui.statusbar.showMessage(status_result, 5000)
 
