@@ -148,7 +148,7 @@ class OkxApiInterface:
         data = result_history_data.get("data")
         if not data:
             return []
-
+        print(data)
         return [{
             "posId": asset.get("posId"),
             "cTime": asset.get("cTime"),
