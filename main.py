@@ -93,12 +93,16 @@ class OKXEarnForm(QtWidgets.QDialog):
         self.ui.table_balearn.clear()
 
         self.ui.table_balearn.setColumnCount(3)
-        self.ui.table_balearn.setColumnWidth(1, 50)
-        self.ui.table_balearn.setColumnWidth(2, 100)
+        self.ui.table_balearn.setColumnWidth(1, 150)
+        self.ui.table_balearn.setColumnWidth(2, 150)
         self.ui.table_balearn.setHorizontalHeaderLabels(["Ticker", "Amount", "Earning"])
 
+        ccy = self.ui.editline_ticker.text().strip()
+        if not ccy:
+            ccy = None
+
         try:
-            data = self.api.earn_balance()
+            data = self.api.earn_balance(ccy=ccy)
         except OKXAPIError as e:
             QMessageBox.critical(self, "Error", str(e))
             return
