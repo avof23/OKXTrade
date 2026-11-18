@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>578</height>
+    <height>598</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -305,23 +305,6 @@
      <set>QAbstractItemView::NoEditTriggers</set>
     </property>
    </widget>
-   <widget class="QPushButton" name="btn_transfer">
-    <property name="geometry">
-     <rect>
-      <x>460</x>
-      <y>50</y>
-      <width>100</width>
-      <height>26</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Transfer</string>
-    </property>
-    <property name="icon">
-     <iconset theme="x-office-presentation">
-      <normaloff>.</normaloff>.</iconset>
-    </property>
-   </widget>
    <widget class="QGroupBox" name="groupBox_acc">
     <property name="geometry">
      <rect>
@@ -409,21 +392,49 @@
      </property>
     </widget>
    </widget>
-   <widget class="QPushButton" name="btn_earn">
+   <widget class="QPushButton" name="btn_history">
     <property name="geometry">
      <rect>
-      <x>570</x>
+      <x>460</x>
       <y>50</y>
-      <width>80</width>
+      <width>100</width>
       <height>26</height>
      </rect>
     </property>
     <property name="text">
-     <string>Earn</string>
+     <string>Get History</string>
     </property>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuAccount">
+    <property name="title">
+     <string>Account</string>
+    </property>
+    <addaction name="actionTransfer"/>
+    <addaction name="actionEarn"/>
+   </widget>
+   <addaction name="menuAccount"/>
+  </widget>
+  <action name="actionTransfer">
+   <property name="text">
+    <string>Transfer</string>
+   </property>
+  </action>
+  <action name="actionEarn">
+   <property name="text">
+    <string>Earn</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

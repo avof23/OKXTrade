@@ -170,11 +170,14 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         self.ui.label_head.setText("Simple Trading Assistant for OKX Market")
         self.setWindowTitle(f"{app_name} — ver {__version__}")
 
+        # Menu Configuration
+        self.ui.actionTransfer.triggered.connect(self.open_transfer)
+        self.ui.actionEarn.triggered.connect(self.open_earn)
+
         # Btn Configuration
         self.ui.btn_getbal.clicked.connect(self.get_ballance)
         self.ui.btn_getord.clicked.connect(self.get_orders)
-        self.ui.btn_transfer.clicked.connect(self.open_transfer)
-        self.ui.btn_earn.clicked.connect(self.open_earn)
+        self.ui.btn_history.clicked.connect(self.get_history)
         self.ui.btn_buy.clicked.connect(lambda: self.send_order("buy"))
         self.ui.btn_sell.clicked.connect(lambda: self.send_order("sell"))
         self.ui.btn_exit.clicked.connect(QtWidgets.QApplication.instance().quit)
@@ -286,6 +289,51 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
             ordticker = self.table_main.item(row, 0).text()
             cancel_btn.clicked.connect(lambda checked, t=ordticker, oid=ordid: self.on_cancel_clicked(t, oid))
             self.table_main.setCellWidget(row, 8, cancel_btn)
+
+    def get_history(self):
+        """Получение итории всех ордеров за период с выводом в таблицу"""
+        self.table_main.clear()
+
+        self.table_main.setColumnCount(8)
+        self.table_main.setColumnWidth(0, 100)
+        self.table_main.setColumnWidth(1, 150)
+        self.table_main.setColumnWidth(2, 30)
+        self.table_main.setColumnWidth(3, 100)
+        self.table_main.setColumnWidth(4, 100)
+        self.table_main.setColumnWidth(5, 100)
+        self.table_main.setColumnWidth(6, 50)
+        self.table_main.setColumnWidth(7, 50)
+        self.table_main.setColumnWidth(8, 50)
+        self.table_main.setHorizontalHeaderLabels(["PosId", "Date-Time", "dirtection", "Instrument",
+                                                   "Symbol", "ClosedPrice", "Closed_amount",
+                                                   "Fee"])
+
+        try:
+            data = self.okx_client_api.get_history()
+
+        except OKXAPIError as e:
+            self.ui.statusbar.setStyleSheet("color: red;")
+            self.ui.statusbar.showMessage(str(e))
+            return
+
+        except Exception as e:
+            self.ui.statusbar.setStyleSheet("color: red;")
+            self.ui.statusbar.showMessage(f"System error: {str(e)}")
+            return
+
+        self.ui.statusbar.setStyleSheet("color: green;")
+        self.ui.statusbar.showMessage(f"Successful get history", 5000)
+        self.table_main.setRowCount(len(data))
+
+        for row, record in enumerate(data):
+            for col, value in enumerate(record.values()):
+                if value is None:
+                    formatted_value = ""
+                elif col >= 5:
+                    formatted_value = str(Decimal(value).quantize(format_balance, rounding=ROUND_DOWN))
+                else:
+                    formatted_value = str(value)
+                self.table_main.setItem(row, col, QTableWidgetItem(formatted_value))
 
     def send_order(self, side: str):
         """Размещение нового ордера в SPOPT торговле"""
