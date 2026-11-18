@@ -97,7 +97,7 @@ class OKXEarnForm(QtWidgets.QDialog):
         self.ui.table_balearn.setColumnWidth(2, 150)
         self.ui.table_balearn.setHorizontalHeaderLabels(["Ticker", "Amount", "Earning"])
 
-        ccy = self.ui.editline_ticker.text().strip()
+        ccy = self.ui.editline_symbol.text().strip()
         if not ccy:
             ccy = None
 
