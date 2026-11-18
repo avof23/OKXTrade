@@ -295,17 +295,16 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         self.table_main.clear()
 
         self.table_main.setColumnCount(8)
-        self.table_main.setColumnWidth(0, 100)
-        self.table_main.setColumnWidth(1, 150)
-        self.table_main.setColumnWidth(2, 30)
-        self.table_main.setColumnWidth(3, 100)
-        self.table_main.setColumnWidth(4, 100)
+        self.table_main.setColumnWidth(0, 150)
+        self.table_main.setColumnWidth(1, 100)
+        self.table_main.setColumnWidth(2, 50)
+        self.table_main.setColumnWidth(3, 80)
+        self.table_main.setColumnWidth(4, 50)
         self.table_main.setColumnWidth(5, 100)
-        self.table_main.setColumnWidth(6, 50)
-        self.table_main.setColumnWidth(7, 50)
-        self.table_main.setColumnWidth(8, 50)
-        self.table_main.setHorizontalHeaderLabels(["PosId", "Date-Time", "dirtection", "Instrument",
-                                                   "Symbol", "ClosedPrice", "Closed_amount",
+        self.table_main.setColumnWidth(6, 80)
+        self.table_main.setColumnWidth(7, 80)
+        self.table_main.setHorizontalHeaderLabels(["PosId", "Date-Time", "dirtect", "Instrument",
+                                                   "Symbol", "ClosedPrice", "Cl_amount",
                                                    "Fee"])
 
         try:
@@ -329,7 +328,7 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
             for col, value in enumerate(record.values()):
                 if value is None:
                     formatted_value = ""
-                elif col >= 5:
+                elif col == 5 or col == 6:
                     formatted_value = str(Decimal(value).quantize(format_balance, rounding=ROUND_DOWN))
                 else:
                     formatted_value = str(value)
