@@ -103,6 +103,8 @@ class OKXEarnForm(QtWidgets.QDialog):
             QMessageBox.critical(self, "Error", str(e))
             return
 
+        self.ui.table_balearn.setRowCount(len(data))
+
         for row, record in enumerate(data):
             for col, value in enumerate(record.values()):
                 if value is None:
@@ -112,7 +114,6 @@ class OKXEarnForm(QtWidgets.QDialog):
                 else:
                     formatted_value = str(value)
                 self.ui.table_balearn.setItem(row, col, QTableWidgetItem(formatted_value))
-                print(f'{row}, {col}, {formatted_value}')
 
     def earn_order(self, side: str):
         ticker = self.ui.editline_symbol.text().strip()
