@@ -48,7 +48,7 @@ class Ui_EarnDialog(object):
 
     def retranslateUi(self, EarnDialog):
         _translate = QtCore.QCoreApplication.translate
-        EarnDialog.setWindowTitle(_translate("EarnDialog", "Dialog"))
+        EarnDialog.setWindowTitle(_translate("EarnDialog", "Earn Manage"))
         self.btn_getE.setText(_translate("EarnDialog", "GetEarn"))
         self.btn_depE.setText(_translate("EarnDialog", "Deposit"))
         self.btn_withE.setText(_translate("EarnDialog", "Withdraw"))
