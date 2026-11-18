@@ -271,7 +271,7 @@ class OkxApiInterface:
             raise OKXAPIError(f"Error OKX: {error_msg}")
 
         data = result_earn_balance.get("data")
-        print(data)
+
         if not data:
             return []
 
