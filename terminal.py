@@ -137,9 +137,12 @@ class OkxApiInterface:
 
         return None
 
-    def get_history(self) -> list:
+    def get_history(self, archive: bool = False) -> list:
         """Получить доступную историю ордеров"""
-        result_history_data = self.account_api.get_positions_history()
+        if archive:
+            result_history_data = self.trade_api.get_orders_history_archive(instType="SPOT")
+        else:
+            result_history_data = self.trade_api.get_orders_history(instType="SPOT")
 
         if result_history_data.get("code") != "0":
             error_msg = result_history_data.get('msg', 'Unknown error')
@@ -148,17 +151,29 @@ class OkxApiInterface:
         data = result_history_data.get("data")
         if not data:
             return []
-        print(data)
-        return [{
-            "posId": asset.get("posId"),
-            "cTime": asset.get("cTime"),
-            "direction": asset.get("direction"),
-            "instId": asset.get("instId"),
-            "ccy": asset.get("ccy"),
-            "closeAvgPx": asset.get("closeAvgPx"),
-            "closeTotalPos": asset.get("closeTotalPos"),
-            "fee": asset.get("fee")
-        } for asset in data]
+
+        parsed_history = []
+
+        for order in data:
+            c_time_ms = int(order.get("cTime", 0))
+            date_str = datetime.fromtimestamp(c_time_ms / 1000.0).strftime("%Y-%m-%d %H:%M:%S") if c_time_ms > 0 else ""
+            price = float(order.get("fillPx", 0)) if order.get("fillPx") else 0.0
+            amount = float(order.get("fillSz", 0)) if order.get("fillSz") else 0.0
+
+            parsed_history.append({
+                "ordId": order.get("ordId"),
+                "cTime": date_str,
+                "side": order.get("side"),
+                "instId": order.get("instId"),
+                "ordType": order.get("ordType"),
+                "fillPx": price,
+                "fillSz": amount,
+                "sz": order.get("sz"),
+                "state": order.get("state"),
+                "fee": order.get("fee")
+            })
+
+        return parsed_history
 
     def place_spot_order(self, inst_id: str, side: str, ord_type: str, amount_str: str, price_str=None, is_usdt=False):
         """

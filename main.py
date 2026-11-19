@@ -177,7 +177,8 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
         # Btn Configuration
         self.ui.btn_getbal.clicked.connect(self.get_ballance)
         self.ui.btn_getord.clicked.connect(self.get_orders)
-        self.ui.btn_history.clicked.connect(self.get_history)
+        self.ui.btn_history.clicked.connect(lambda:  self.get_history(False))
+        self.ui.btn_archive.clicked.connect(lambda: self.get_history(True))
         self.ui.btn_buy.clicked.connect(lambda: self.send_order("buy"))
         self.ui.btn_sell.clicked.connect(lambda: self.send_order("sell"))
         self.ui.btn_exit.clicked.connect(QtWidgets.QApplication.instance().quit)
@@ -290,25 +291,27 @@ class OKXTradeMainWindow(QtWidgets.QMainWindow):
             cancel_btn.clicked.connect(lambda checked, t=ordticker, oid=ordid: self.on_cancel_clicked(t, oid))
             self.table_main.setCellWidget(row, 8, cancel_btn)
 
-    def get_history(self):
+    def get_history(self, is_archive: bool = False):
         """Получение итории всех ордеров за период с выводом в таблицу"""
         self.table_main.clear()
 
-        self.table_main.setColumnCount(8)
-        self.table_main.setColumnWidth(0, 150)
-        self.table_main.setColumnWidth(1, 100)
+        self.table_main.setColumnCount(10)
+        self.table_main.setColumnWidth(0, 50)
+        self.table_main.setColumnWidth(1, 150)
         self.table_main.setColumnWidth(2, 50)
         self.table_main.setColumnWidth(3, 80)
-        self.table_main.setColumnWidth(4, 50)
+        self.table_main.setColumnWidth(4, 80)
         self.table_main.setColumnWidth(5, 100)
         self.table_main.setColumnWidth(6, 80)
-        self.table_main.setColumnWidth(7, 80)
-        self.table_main.setHorizontalHeaderLabels(["PosId", "Date-Time", "dirtect", "Instrument",
-                                                   "Symbol", "ClosedPrice", "Cl_amount",
-                                                   "Fee"])
+        self.table_main.setColumnWidth(7, 50)
+        self.table_main.setColumnWidth(8, 50)
+        self.table_main.setColumnWidth(9, 100)
+        self.table_main.setHorizontalHeaderLabels(["OrdId", "Date-Time", "side", "Instrument",
+                                                   "Type", "Price", "Amount", "Size",
+                                                   "State", "Fee"])
 
         try:
-            data = self.okx_client_api.get_history()
+            data = self.okx_client_api.get_history(is_archive)
 
         except OKXAPIError as e:
             self.ui.statusbar.setStyleSheet("color: red;")

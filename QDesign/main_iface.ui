@@ -26,7 +26,7 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>781</width>
+      <width>311</width>
       <height>21</height>
      </rect>
     </property>
@@ -43,8 +43,8 @@
    <widget class="QPushButton" name="btn_getbal">
     <property name="geometry">
      <rect>
-      <x>240</x>
-      <y>50</y>
+      <x>330</x>
+      <y>20</y>
       <width>100</width>
       <height>26</height>
      </rect>
@@ -60,7 +60,7 @@
    <widget class="QPushButton" name="btn_getord">
     <property name="geometry">
      <rect>
-      <x>350</x>
+      <x>330</x>
       <y>50</y>
       <width>100</width>
       <height>26</height>
@@ -392,11 +392,24 @@
      </property>
     </widget>
    </widget>
+   <widget class="QPushButton" name="btn_archive">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>50</y>
+      <width>100</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Get Archive</string>
+    </property>
+   </widget>
    <widget class="QPushButton" name="btn_history">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>50</y>
+      <x>440</x>
+      <y>20</y>
       <width>100</width>
       <height>26</height>
      </rect>
